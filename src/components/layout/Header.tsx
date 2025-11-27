@@ -17,11 +17,11 @@ const navLinks = [
 export function Header() {
     const pathname = usePathname();
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-    const { isAuthenticated, user, logout } = useAuth();
+    const { user, logout, loading } = useAuth();
     const [showUserMenu, setShowUserMenu] = useState(false);
 
     // Filter links based on authentication status
-    const visibleNavLinks = navLinks.filter(link => !link.requiresAuth || isAuthenticated);
+    const visibleNavLinks = navLinks.filter(link => !link.requiresAuth || user);
 
     return (
         <header className="sticky top-0 z-50 w-full bg-secondary-1/80 backdrop-blur-md border-b border-secondary-2">
@@ -57,7 +57,7 @@ export function Header() {
 
                 {/* User / Auth Actions */}
                 <div className="flex items-center gap-4">
-                    {isAuthenticated ? (
+                    {user ? (
                         <div className="relative">
                             <button
                                 onClick={() => setShowUserMenu(!showUserMenu)}
