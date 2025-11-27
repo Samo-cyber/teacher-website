@@ -6,6 +6,8 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useState, FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { CheckCircle2, Eye, EyeOff } from "lucide-react";
+import supabase from '@/lib/supabase/browserClient';
+
 
 export default function SignupPage() {
     const [name, setName] = useState("");
