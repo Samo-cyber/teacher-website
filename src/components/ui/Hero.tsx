@@ -38,7 +38,7 @@ export function Hero() {
                         <div className="relative aspect-[3/4] md:aspect-[4/5] w-full">
                             <div className="absolute inset-0 bg-accent/10 rounded-2xl md:rounded-3xl transform rotate-2 translate-x-2 translate-y-2 md:rotate-3 md:translate-x-4 md:translate-y-4 -z-10" />
                             <Image
-                                src="/hero-main.png"
+                                src="/hero-main.jpg"
                                 alt="Ahmed Salah Hero"
                                 fill
                                 className="object-cover rounded-xl md:rounded-2xl shadow-xl md:shadow-2xl"

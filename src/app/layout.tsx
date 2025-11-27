@@ -30,9 +30,7 @@ export const metadata: Metadata = {
   description: "Premium educational platform for Philosophy and Psychology.",
 };
 
-import { Header } from "@/components/layout/Header";
-import { Footer } from "@/components/layout/Footer";
-import { AuthProvider } from "@/contexts/AuthContext";
+import RootLayoutClient from "./RootLayoutClient";
 
 export default function RootLayout({
   children,
@@ -44,11 +42,7 @@ export default function RootLayout({
       <body
         className={`${cairo.variable} ${ibmPlexArabic.variable} ${poppins.variable} ${inter.variable} antialiased font-cairo bg-secondary-1 text-primary-1 flex flex-col min-h-screen`}
       >
-        <AuthProvider>
-          <Header />
-          <main className="flex-grow">{children}</main>
-          <Footer />
-        </AuthProvider>
+        <RootLayoutClient>{children}</RootLayoutClient>
       </body>
     </html>
   );

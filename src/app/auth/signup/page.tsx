@@ -32,7 +32,6 @@ export default function SignupPage() {
 
             if (result.success) {
                 setSuccess(true);
-                // Redirect to login after 2 seconds
                 setTimeout(() => {
                     router.push('/auth/login');
                 }, 2000);
@@ -52,7 +51,7 @@ export default function SignupPage() {
     if (success) {
         return (
             <div className="min-h-screen flex items-center justify-center py-4 px-4 sm:px-6 lg:px-8 bg-secondary-2/30">
-                <div className="max-w-md w-full space-y-4 bg-white p-6 sm:p-8 rounded-2xl shadow-lg border border-secondary-2 text-center">
+                <div className="max-w-lg w-full space-y-4 bg-white p-6 sm:p-8 rounded-2xl shadow-lg border border-secondary-2 text-center">
                     <div className="flex justify-center">
                         <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center">
                             <CheckCircle2 size={40} className="text-green-600" />
@@ -69,16 +68,26 @@ export default function SignupPage() {
 
     return (
         <div className="min-h-screen flex items-center justify-center py-4 px-4 sm:px-6 lg:px-8 bg-secondary-2/30">
-            <div className="w-full max-w-[90%] sm:max-w-md space-y-3 bg-white p-6 sm:p-8 rounded-2xl shadow-lg border border-secondary-2">
+            <div className="w-full max-w-[95%] sm:max-w-lg space-y-4 bg-white p-6 sm:p-8 rounded-2xl shadow-lg border border-secondary-2">
+                {/* Home Link */}
+                <div className="text-center pb-2.5 border-b border-secondary-3">
+                    <Link href="/" className="text-sm text-primary-2 hover:text-primary-1 transition-colors inline-flex items-center gap-1.5">
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                        </svg>
+                        <span>العودة للرئيسية</span>
+                    </Link>
+                </div>
+
                 <div className="text-center">
-                    <h2 className="text-2xl sm:text-3xl font-bold text-primary-1">إنشاء حساب جديد</h2>
-                    <p className="mt-1 text-xs sm:text-sm text-primary-1/60">
+                    <h2 className="text-3xl sm:text-4xl font-bold text-primary-1">إنشاء حساب جديد</h2>
+                    <p className="mt-1.5 text-sm sm:text-base text-primary-1/60">
                         انضم إلينا وابدأ رحلة التفوق
                     </p>
                 </div>
-                <form className="mt-3 space-y-3" onSubmit={handleSubmit}>
+                <form className="mt-4 space-y-3.5" onSubmit={handleSubmit}>
                     {error && (
-                        <div className="bg-red-50 border border-red-200 text-red-600 px-3 py-2 rounded-lg text-xs sm:text-sm">
+                        <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-2.5 rounded-lg text-sm">
                             <p className="font-medium">{error}</p>
                             {emailExists && (
                                 <p className="mt-1">
@@ -89,9 +98,9 @@ export default function SignupPage() {
                             )}
                         </div>
                     )}
-                    <div className="space-y-2">
+                    <div className="space-y-3">
                         <div>
-                            <label htmlFor="name" className="block text-xs sm:text-sm font-medium text-primary-1/80 mb-1">
+                            <label htmlFor="name" className="block text-sm font-medium text-primary-1/80 mb-1.5">
                                 الاسم الكامل
                             </label>
                             <input
@@ -102,12 +111,12 @@ export default function SignupPage() {
                                 required
                                 value={name}
                                 onChange={(e) => setName(e.target.value)}
-                                className="appearance-none relative block w-full px-3 py-2 sm:py-3 border border-secondary-3 placeholder-gray-400 text-primary-1 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-2/20 focus:border-primary-2 text-sm transition-all"
+                                className="appearance-none relative block w-full px-4 py-2.5 border border-secondary-3 placeholder-gray-400 text-primary-1 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-2/20 focus:border-primary-2 text-base transition-all"
                                 placeholder="محمد أحمد"
                             />
                         </div>
                         <div>
-                            <label htmlFor="email" className="block text-xs sm:text-sm font-medium text-primary-1/80 mb-1">
+                            <label htmlFor="email" className="block text-sm font-medium text-primary-1/80 mb-1.5">
                                 البريد الإلكتروني
                             </label>
                             <input
@@ -118,12 +127,12 @@ export default function SignupPage() {
                                 required
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
-                                className="appearance-none relative block w-full px-3 py-2 sm:py-3 border border-secondary-3 placeholder-gray-400 text-primary-1 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-2/20 focus:border-primary-2 text-sm transition-all"
+                                className="appearance-none relative block w-full px-4 py-2.5 border border-secondary-3 placeholder-gray-400 text-primary-1 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-2/20 focus:border-primary-2 text-base transition-all"
                                 placeholder="name@example.com"
                             />
                         </div>
                         <div>
-                            <label htmlFor="phone" className="block text-xs sm:text-sm font-medium text-primary-1/80 mb-1">
+                            <label htmlFor="phone" className="block text-sm font-medium text-primary-1/80 mb-1.5">
                                 رقم الهاتف
                             </label>
                             <input
@@ -134,12 +143,12 @@ export default function SignupPage() {
                                 required
                                 value={phone}
                                 onChange={(e) => setPhone(e.target.value)}
-                                className="appearance-none relative block w-full px-3 py-2 sm:py-3 border border-secondary-3 placeholder-gray-400 text-primary-1 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-2/20 focus:border-primary-2 text-sm transition-all"
+                                className="appearance-none relative block w-full px-4 py-2.5 border border-secondary-3 placeholder-gray-400 text-primary-1 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-2/20 focus:border-primary-2 text-base transition-all"
                                 placeholder="01xxxxxxxxx"
                             />
                         </div>
                         <div>
-                            <label htmlFor="password" className="block text-xs sm:text-sm font-medium text-primary-1/80 mb-1">
+                            <label htmlFor="password" className="block text-sm font-medium text-primary-1/80 mb-1.5">
                                 كلمة المرور
                             </label>
                             <div className="relative">
@@ -151,7 +160,7 @@ export default function SignupPage() {
                                     required
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
-                                    className="appearance-none relative block w-full px-3 py-2 sm:py-3 border border-secondary-3 placeholder-gray-400 text-primary-1 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-2/20 focus:border-primary-2 text-sm transition-all"
+                                    className="appearance-none relative block w-full px-4 py-2.5 border border-secondary-3 placeholder-gray-400 text-primary-1 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-2/20 focus:border-primary-2 text-base transition-all"
                                     placeholder="••••••••"
                                 />
                                 <button
@@ -159,20 +168,20 @@ export default function SignupPage() {
                                     onClick={() => setShowPassword(!showPassword)}
                                     className="absolute left-3 top-1/2 -translate-y-1/2 text-primary-1/40 hover:text-primary-1/60 transition-colors"
                                 >
-                                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                                    {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                                 </button>
                             </div>
                         </div>
                     </div>
 
                     <div>
-                        <Button type="submit" className="w-full py-2 sm:py-3" disabled={loading}>
+                        <Button type="submit" className="w-full py-3 text-base" disabled={loading}>
                             {loading ? "جاري إنشاء الحساب..." : "إنشاء الحساب"}
                         </Button>
                     </div>
                 </form>
 
-                <div className="text-center text-xs sm:text-sm">
+                <div className="text-center text-sm">
                     <span className="text-primary-1/60">لديك حساب بالفعل؟ </span>
                     <Link href="/auth/login" className="font-bold text-primary-1 hover:text-primary-2">
                         سجل دخولك
@@ -180,7 +189,7 @@ export default function SignupPage() {
                 </div>
 
                 <div className="text-center text-xs text-primary-1/40 pt-2 border-t border-secondary-3">
-                    © 2024 Ahmed Salah. جميع الحقوق محفوظة
+                    <p>جميع الحقوق محفوظه © {new Date().getFullYear()} Smarto</p>
                 </div>
             </div>
         </div>
