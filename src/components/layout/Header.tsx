@@ -7,11 +7,16 @@ import { Menu, X, User } from "lucide-react";
 import { useState } from "react";
 
 const navLinks = [
-    { href: "/", label: "الرئيسية" },
-    { href: "/schedules", label: "الجداول" },
-    { href: "/questions", label: "الأسئلة" },
-    { href: "/my-bookings", label: "حجوزاتي" },
+    { href: "/", label: "الرئيسية", requiresAuth: false },
+    { href: "/schedules", label: "الجداول", requiresAuth: false },
+    { href: "/questions", label: "الأسئلة", requiresAuth: false },
+    { href: "/my-bookings", label: "حجوزاتي", requiresAuth: true },
 ];
+
+// Filter links based on authentication status
+// TODO: Replace 'false' with actual auth state when authentication is implemented
+const isAuthenticated = false;
+const visibleNavLinks = navLinks.filter(link => !link.requiresAuth || isAuthenticated);
 
 export function Header() {
     const pathname = usePathname();
@@ -30,7 +35,7 @@ export function Header() {
 
                 {/* Desktop Navigation */}
                 <nav className="hidden md:flex items-center gap-8">
-                    {navLinks.map((link) => (
+                    {visibleNavLinks.map((link) => (
                         <Link
                             key={link.href}
                             href={link.href}
@@ -69,7 +74,7 @@ export function Header() {
             {/* Mobile Menu */}
             {isMobileMenuOpen && (
                 <div className="md:hidden bg-secondary-1 border-b border-secondary-2 p-4 flex flex-col gap-4">
-                    {navLinks.map((link) => (
+                    {visibleNavLinks.map((link) => (
                         <Link
                             key={link.href}
                             href={link.href}
