@@ -3,8 +3,9 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { Menu, X, User } from "lucide-react";
+import { Menu, X, User, LogOut } from "lucide-react";
 import { useState } from "react";
+import { useAuth } from "@/contexts/AuthContext";
 
 const navLinks = [
     { href: "/", label: "الرئيسية", requiresAuth: false },
@@ -13,14 +14,14 @@ const navLinks = [
     { href: "/my-bookings", label: "حجوزاتي", requiresAuth: true },
 ];
 
-// Filter links based on authentication status
-// TODO: Replace 'false' with actual auth state when authentication is implemented
-const isAuthenticated = false;
-const visibleNavLinks = navLinks.filter(link => !link.requiresAuth || isAuthenticated);
-
 export function Header() {
     const pathname = usePathname();
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+    const { isAuthenticated, user, logout } = useAuth();
+    const [showUserMenu, setShowUserMenu] = useState(false);
+
+    // Filter links based on authentication status
+    const visibleNavLinks = navLinks.filter(link => !link.requiresAuth || isAuthenticated);
 
     return (
         <header className="sticky top-0 z-50 w-full bg-secondary-1/80 backdrop-blur-md border-b border-secondary-2">
@@ -56,18 +57,47 @@ export function Header() {
 
                 {/* User / Auth Actions */}
                 <div className="flex items-center gap-4">
-                    <Link
-                        href="/profile"
-                        className="p-2 rounded-full bg-secondary-2 text-primary-1 hover:bg-secondary-3 transition-colors"
-                    >
-                        <User size={24} />
-                    </Link>
-                    <Link
-                        href="/auth/login"
-                        className="hidden md:inline-flex px-6 py-2 bg-primary-1 text-white rounded-md font-medium hover:bg-primary-2 transition-colors duration-200"
-                    >
-                        تسجيل الدخول
-                    </Link>
+                    {isAuthenticated ? (
+                        <div className="relative">
+                            <button
+                                onClick={() => setShowUserMenu(!showUserMenu)}
+                                className="p-2 rounded-full bg-secondary-2 text-primary-1 hover:bg-secondary-3 transition-colors"
+                            >
+                                <User size={24} />
+                            </button>
+                            {showUserMenu && (
+                                <div className="absolute left-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-secondary-2 py-2 z-50">
+                                    <Link
+                                        href="/profile"
+                                        className="block px-4 py-2 text-primary-1 hover:bg-secondary-2 transition-colors"
+                                        onClick={() => setShowUserMenu(false)}
+                                    >
+                                        <div className="flex items-center gap-2">
+                                            <User size={18} />
+                                            <span>الملف الشخصي</span>
+                                        </div>
+                                    </Link>
+                                    <button
+                                        onClick={() => {
+                                            setShowUserMenu(false);
+                                            logout();
+                                        }}
+                                        className="w-full text-right px-4 py-2 text-primary-1 hover:bg-secondary-2 transition-colors flex items-center gap-2"
+                                    >
+                                        <LogOut size={18} />
+                                        <span>تسجيل الخروج</span>
+                                    </button>
+                                </div>
+                            )}
+                        </div>
+                    ) : (
+                        <Link
+                            href="/auth/login"
+                            className="px-6 py-2 bg-primary-1 text-white rounded-md font-medium hover:bg-primary-2 transition-colors duration-200"
+                        >
+                            تسجيل الدخول
+                        </Link>
+                    )}
                 </div>
             </div>
 

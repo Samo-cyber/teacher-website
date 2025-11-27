@@ -1,12 +1,23 @@
-import { Button } from "@/components/ui/Button";
-import { User, Mail, Phone, MapPin } from "lucide-react";
-import Image from "next/image";
+"use client";
 
-export default function ProfilePage() {
+import { Button } from "@/components/ui/Button";
+import { User, Mail, Phone, MapPin, LogOut } from "lucide-react";
+import { ProtectedRoute } from "@/components/ProtectedRoute";
+import { useAuth } from "@/contexts/AuthContext";
+
+function ProfileContent() {
+    const { user, logout } = useAuth();
+
     return (
         <div className="min-h-screen bg-secondary-2/30 py-12">
             <div className="container mx-auto px-6 max-w-4xl">
-                <h1 className="text-3xl font-bold text-primary-1 mb-8">الملف الشخصي</h1>
+                <div className="flex justify-between items-center mb-8">
+                    <h1 className="text-3xl font-bold text-primary-1">الملف الشخصي</h1>
+                    <Button variant="outline" onClick={logout} className="flex items-center gap-2">
+                        <LogOut size={18} />
+                        تسجيل الخروج
+                    </Button>
+                </div>
 
                 <div className="bg-white rounded-2xl shadow-sm border border-secondary-2 overflow-hidden">
                     {/* Header / Cover */}
@@ -23,7 +34,7 @@ export default function ProfilePage() {
                     <div className="pt-16 px-8 pb-8">
                         <div className="flex justify-between items-start mb-8">
                             <div>
-                                <h2 className="text-2xl font-bold text-primary-1">محمد أحمد</h2>
+                                <h2 className="text-2xl font-bold text-primary-1">{user?.name || 'مستخدم'}</h2>
                                 <p className="text-primary-1/60">طالب - الصف الثالث الثانوي</p>
                             </div>
                             <Button variant="outline">تعديل الملف</Button>
@@ -37,7 +48,7 @@ export default function ProfilePage() {
                                 <div className="space-y-4">
                                     <div className="flex items-center gap-3 text-primary-1/80">
                                         <Mail size={20} className="text-primary-2" />
-                                        <span>mohamed.ahmed@example.com</span>
+                                        <span>{user?.email || 'لا يوجد بريد إلكتروني'}</span>
                                     </div>
                                     <div className="flex items-center gap-3 text-primary-1/80">
                                         <Phone size={20} className="text-primary-2" />
@@ -70,5 +81,13 @@ export default function ProfilePage() {
                 </div>
             </div>
         </div>
+    );
+}
+
+export default function ProfilePage() {
+    return (
+        <ProtectedRoute>
+            <ProfileContent />
+        </ProtectedRoute>
     );
 }

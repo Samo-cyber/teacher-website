@@ -1,8 +1,11 @@
+"use client";
+
 import { Button } from "@/components/ui/Button";
 import { Calendar, Clock, MapPin, Video } from "lucide-react";
 import Link from "next/link";
+import { ProtectedRoute } from "@/components/ProtectedRoute";
 
-export default function MyBookingsPage() {
+function MyBookingsContent() {
     return (
         <div className="min-h-screen bg-secondary-2/30 py-12">
             <div className="container mx-auto px-6">
@@ -64,5 +67,13 @@ export default function MyBookingsPage() {
         </div> */}
             </div>
         </div>
+    );
+}
+
+export default function MyBookingsPage() {
+    return (
+        <ProtectedRoute>
+            <MyBookingsContent />
+        </ProtectedRoute>
     );
 }

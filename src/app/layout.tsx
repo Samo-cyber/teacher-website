@@ -32,6 +32,7 @@ export const metadata: Metadata = {
 
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
+import { AuthProvider } from "@/contexts/AuthContext";
 
 export default function RootLayout({
   children,
@@ -43,9 +44,11 @@ export default function RootLayout({
       <body
         className={`${cairo.variable} ${ibmPlexArabic.variable} ${poppins.variable} ${inter.variable} antialiased font-cairo bg-secondary-1 text-primary-1 flex flex-col min-h-screen`}
       >
-        <Header />
-        <main className="flex-grow">{children}</main>
-        <Footer />
+        <AuthProvider>
+          <Header />
+          <main className="flex-grow">{children}</main>
+          <Footer />
+        </AuthProvider>
       </body>
     </html>
   );
