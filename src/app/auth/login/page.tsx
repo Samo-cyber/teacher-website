@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import Link from "next/link";
 import { Button } from "@/components/ui/Button";
@@ -22,14 +22,16 @@ export default function LoginPage() {
         setLoading(true);
 
         try {
-            const success = await login(email, password);
-            if (success) {
+            const result = await login(email, password);
+            // login returns an object like { success: boolean, message?: string }
+            if (result && (result as any).success) {
                 router.push('/');
             } else {
-                setError("فشل تسجيل الدخول. يرجى التحقق من البيانات.");
+                const msg = (result && (result as any).message) ? (result as any).message : "فشل تسجيل الدخول. يرجى التحقق من البريد أو كلمة المرور.";
+                setError(msg);
             }
-        } catch (err) {
-            setError("حدث خطأ أثناء تسجيل الدخول.");
+        } catch (err: any) {
+            setError(err?.message ?? "حدث خطأ أثناء تسجيل الدخول.");
         } finally {
             setLoading(false);
         }
