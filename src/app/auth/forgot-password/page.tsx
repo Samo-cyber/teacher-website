@@ -1,9 +1,10 @@
-"use client";
+'use client';
 
 import Link from "next/link";
 import { Button } from "@/components/ui/Button";
 import { useState, FormEvent } from "react";
 import { CheckCircle2, ArrowRight } from "lucide-react";
+import supabase from '@/lib/supabase/browserClient';
 
 export default function ForgotPasswordPage() {
     const [email, setEmail] = useState("");
@@ -17,18 +18,20 @@ export default function ForgotPasswordPage() {
         setLoading(true);
 
         try {
-            const registeredUsers = JSON.parse(localStorage.getItem('registeredUsers') || '[]');
-            const userExists = registeredUsers.some((u: any) => u.email === email);
+            // طلب Supabase لإرسال رابط استعادة كلمة المرور
+            const { error: sbError } = await supabase.auth.resetPasswordForEmail(email, {
+                // اختياري: تحدد الـ redirect إذا حبيت
+                // redirectTo: `${window.location.origin}/auth/callback`
+            });
 
-            await new Promise(resolve => setTimeout(resolve, 1000));
-
-            if (userExists) {
-                setSuccess(true);
+            if (sbError) {
+                // عرض رسالة الخطأ من Supabase إن وُجدت
+                setError(sbError.message || "حدث خطأ أثناء إرسال رابط الاستعادة.");
             } else {
-                setError("لا يوجد حساب مسجل بهذا البريد الإلكتروني");
+                setSuccess(true);
             }
-        } catch (err) {
-            setError("حدث خطأ. يرجى المحاولة مرة أخرى.");
+        } catch (err: any) {
+            setError(err?.message ?? "حدث خطأ. يرجى المحاولة مرة أخرى.");
         } finally {
             setLoading(false);
         }
