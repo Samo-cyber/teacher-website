@@ -6,6 +6,7 @@ import supabase from "@/lib/supabase/browserClient";
 interface AuthResult {
     success: boolean;
     message?: string;
+    raw?: any;
 }
 
 interface AuthContextType {
@@ -22,13 +23,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const [user, setUser] = useState<any>(null);
     const [loading, setLoading] = useState(true);
 
-    // Load session on mount
     useEffect(() => {
         const getSession = async () => {
             try {
                 const { data } = await supabase.auth.getSession();
+                console.log("getSession data:", data);
                 setUser(data.session?.user || null);
-            } catch {
+            } catch (e) {
+                console.error("getSession error:", e);
                 setUser(null);
             } finally {
                 setLoading(false);
@@ -37,111 +39,78 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
         getSession();
 
-        // Listen to session changes
         const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
+            console.log("onAuthStateChange", _event, session);
             setUser(session?.user || null);
         });
 
         return () => {
-            // safe unsubscribe
             try {
                 listener.subscription.unsubscribe();
-            } catch {
-                // ignore
-            }
+            } catch { }
         };
     }, []);
 
-    // ---------------------------
-    // SIGNUP
-    // ---------------------------
-
     const signup = async (name: string, email: string, phone: string, password: string): Promise<AuthResult> => {
         try {
-            const { data, error } = await supabase.auth.signUp({
+            const res = await supabase.auth.signUp({
                 email,
                 password,
-                options: {
-                    data: {
-                        full_name: name,
-                        phone: phone,
-                    },
-                },
+                options: { data: { full_name: name, phone } },
             });
+            console.log("signUp response:", res);
 
-            if (error) {
-                return { success: false, message: error.message };
+            // if supabase returns user null (because confirm required), still attempt updateUser to persist metadata
+            if (res.error) {
+                return { success: false, message: res.error.message, raw: res };
             }
 
-            // Ensure metadata persists (best-effort)
+            // try updateUser as best-effort (may fail if no session yet)
             try {
-                await supabase.auth.updateUser({
-                    data: { full_name: name, phone },
-                });
-            } catch {
-                // ignore update errors
+                const upd = await supabase.auth.updateUser({ data: { full_name: name, phone } });
+                console.log("updateUser after signUp:", upd);
+            } catch (e) {
+                console.warn("updateUser failed (expected if no session):", e);
             }
 
-            return { success: true, message: "تم إنشاء الحساب. تحقق من بريدك لتأكيد الحساب." };
+            return { success: true, message: "تم إنشاء الحساب. تحقق من بريدك لتأكيد الحساب.", raw: res };
         } catch (e: any) {
-            return { success: false, message: e?.message || "Signup failed" };
+            console.error("signup exception:", e);
+            return { success: false, message: e?.message || "Signup failed", raw: e };
         }
     };
-
-    // ---------------------------
-    // LOGIN
-    // ---------------------------
 
     const login = async (email: string, password: string): Promise<AuthResult> => {
         try {
-            const { data, error } = await supabase.auth.signInWithPassword({
-                email,
-                password,
-            });
+            const res = await supabase.auth.signInWithPassword({ email, password });
+            console.log("signInWithPassword response:", res);
 
-            if (error) {
-                return {
-                    success: false,
-                    message: error.message || "فشل تسجيل الدخول",
-                };
+            if (res.error) {
+                // common causes: invalid credentials, email not confirmed (message tells)
+                return { success: false, message: res.error.message || "فشل تسجيل الدخول", raw: res };
             }
 
-            setUser(data.user);
-
-            return {
-                success: true,
-                message: "تم تسجيل الدخول بنجاح",
-            };
-        } catch (err: any) {
-            return {
-                success: false,
-                message: err?.message || "خطأ غير متوقع",
-            };
+            setUser(res.data.user);
+            return { success: true, message: "تم تسجيل الدخول بنجاح", raw: res };
+        } catch (e: any) {
+            console.error("login exception:", e);
+            return { success: false, message: e?.message || "خطأ غير متوقع", raw: e };
         }
     };
 
-    // ---------------------------
-    // LOGOUT
-    // ---------------------------
-
     const logout = async () => {
         try {
-            await supabase.auth.signOut();
+            const res = await supabase.auth.signOut();
+            console.log("signOut response:", res);
+        } catch (e) {
+            console.error("signOut error:", e);
         } finally {
             setUser(null);
         }
     };
 
     return (
-        <AuthContext.Provider
-            value={{
-                user,
-                loading,
-                signup,
-                login,
-                logout,
-            }}
-        >
+        <AuthContext.Provider value={{ user, loading, signup, login, logout }}>
             {children}
         </AuthContext.Provider>
     );
