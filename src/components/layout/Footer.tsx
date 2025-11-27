@@ -63,7 +63,7 @@ export function Footer() {
                 </div>
 
                 <div className="border-t border-secondary-3 pt-8 text-center text-primary-1/60 text-sm">
-                    <p>© {new Date().getFullYear()} أحمد صلاح. جميع الحقوق محفوظة.</p>
+                    <p>جميع الحقوق محفوظه © {new Date().getFullYear()} Smarto</p>
                 </div>
             </div>
         </footer>
