@@ -4,14 +4,17 @@ import Link from "next/link";
 import { Button } from "@/components/ui/Button";
 import { useState, FormEvent } from "react";
 import { Eye, EyeOff, CheckCircle2 } from "lucide-react";
-import supabase from '@/lib/supabase/browserClient';
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function SignupPage() {
+  const { signup } = useAuth();
+
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+
   const [error, setError] = useState("");
   const [emailExists, setEmailExists] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -23,56 +26,29 @@ export default function SignupPage() {
     setEmailExists(false);
     setLoading(true);
 
-    try {
-      const { data, error: signUpError } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          data: { name, phone }
-        }
-      });
+    const result = await signup(name, email, phone, password);
 
-      if (signUpError) {
-        const msg = signUpError.message ?? "حدث خطأ أثناء التسجيل.";
-        const exists = /already registered|duplicate|user exists|already exists/i.test(msg);
-        setError(msg);
-        setEmailExists(exists);
-        setLoading(false);
-        return;
-      }
-
-      const userId = data?.user?.id ?? null;
-      if (userId) {
-        try {
-          await supabase.from("profiles").insert({
-            id: userId,
-            email,
-            full_name: name,
-            phone
-          });
-        } catch (_) {
-          // تجاهل خطأ الإدراج حتى لا نكسر تجربة التسجيل
-        }
-      }
-
-      // عرض شاشة الإشعار (تم الإرسال) — بدون تحويل
-      setSuccess(true);
+    if (!result.success) {
+      const msg = result.message || "حدث خطأ أثناء التسجيل.";
+      const exists = /already registered|duplicate|exists|registered/i.test(msg);
+      setError(msg);
+      setEmailExists(exists);
       setLoading(false);
-
-    } catch (err: any) {
-      setError(err?.message ?? "حدث خطأ أثناء إنشاء الحساب.");
-      setLoading(false);
+      return;
     }
+
+    setSuccess(true);
+    setLoading(false);
   };
 
-  // شاشة النجاح (check-email style)
+  // شاشة النجاح (نفس تنسيق check-email)
   if (success) {
     return (
       <div className="min-h-screen flex items-center justify-center py-4 px-4 sm:px-6 lg:px-8 bg-secondary-2/30">
         <div className="max-w-lg w-full space-y-4 bg-white p-6 sm:p-8 rounded-2xl shadow-lg border border-secondary-2 text-center">
           <div className="flex justify-center mb-2">
-            <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center">
-              <CheckCircle2 size={40} className="text-primary-2" />
+            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center">
+              <CheckCircle2 size={40} className="text-green-600" />
             </div>
           </div>
 
@@ -81,7 +57,7 @@ export default function SignupPage() {
           </h2>
 
           <p className="text-sm text-primary-1/60 mt-1">
-            يرجى التحقق من صندوق الوارد أو البريد غير المرغوب فيه (Spam)
+            يرجى التحقق من صندوق الوارد أو البريد غير المرغوب فيه (Spam).
           </p>
 
           <div className="mt-4">
@@ -101,14 +77,16 @@ export default function SignupPage() {
     );
   }
 
-  // الفورم الأصلية
+  // الفورم
   return (
     <div className="min-h-screen flex items-center justify-center py-4 px-4 sm:px-6 lg:px-8 bg-secondary-2/30">
       <div className="w-full max-w-[95%] sm:max-w-lg space-y-4 bg-white p-6 sm:p-8 rounded-2xl shadow-lg border border-secondary-2">
 
         <div className="text-center pb-2.5 border-b border-secondary-3">
-          {/* لو عايز تشيل الرابط للـ home احذفه من هنا */}
-          <Link href="/" className="text-sm text-primary-2 hover:text-primary-1 transition-colors inline-flex items-center gap-1.5">
+          <Link
+            href="/"
+            className="text-sm text-primary-2 hover:text-primary-1 transition-colors inline-flex items-center gap-1.5"
+          >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
             </svg>
@@ -163,7 +141,7 @@ export default function SignupPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-primary-1/80 mb-1.5">رقم الهاتف</label>
+              <label className="block text-sm font-medium text-primary-1/80 mb-1.5"> رقم الهاتف</label>
               <input
                 type="tel"
                 required
