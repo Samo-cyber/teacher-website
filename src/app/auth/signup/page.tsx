@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
 import Link from "next/link";
 import { Button } from "@/components/ui/Button";
-import { useAuth } from "@/contexts/AuthContext";
+// import { useAuth } from "@/contexts/AuthContext"; // مش محتاج بعد التعديل، لو حابب تستخدم الـ Context عرفه بدل السطور دي
 import { useState, FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { CheckCircle2, Eye, EyeOff } from "lucide-react";
@@ -19,7 +19,7 @@ export default function SignupPage() {
     const [success, setSuccess] = useState(false);
     const [emailExists, setEmailExists] = useState(false);
     const [loading, setLoading] = useState(false);
-    const { signup } = useAuth();
+    // const { signup } = useAuth();
     const router = useRouter();
 
     const handleSubmit = async (e: FormEvent) => {
@@ -30,22 +30,49 @@ export default function SignupPage() {
         setLoading(true);
 
         try {
-            const result = await signup(name, email, phone, password);
+            // 1) تنفيذ تسجيل المستخدم في Supabase Auth
+            const { data, error: signUpError } = await supabase.auth.signUp({
+                email,
+                password,
+                options: {
+                    data: { name, phone } // يخزن هذا في user_metadata
+                }
+            });
 
-            if (result.success) {
-                setSuccess(true);
-                setTimeout(() => {
-                    router.push('/auth/login');
-                }, 2000);
-            } else {
-                setError(result.message);
-                if (result.emailExists) {
-                    setEmailExists(true);
+            if (signUpError) {
+                const message = signUpError.message ?? 'حدث خطأ أثناء التسجيل.';
+                const emailExistsFlag = /already registered|duplicate|user exists|already exists/i.test(message);
+                setError(message);
+                setEmailExists(emailExistsFlag);
+                setLoading(false);
+                return;
+            }
+
+            // 2) إن كان user id متوفر، نحاول ندخل سجل profile في جدول "profiles" (لو الجدول موجود)
+            const userId = data?.user?.id ?? null;
+            if (userId) {
+                try {
+                    await supabase.from('profiles').insert({
+                        id: userId,
+                        email,
+                        full_name: name,
+                        phone
+                    });
+                } catch (insertErr) {
+                    // نتجاهل فشل الإدراج بصمت (مش حنخرب تجربة التسجيل)
+                    // لو عايز تعرض رسالة، ممكن تفعلها هنا
                 }
             }
-        } catch (err) {
-            setError("حدث خطأ أثناء إنشاء الحساب.");
-        } finally {
+
+            // 3) نجاح التسجيل — نعرض نجاح ونحول المستخدم بعد ثانيتين
+            setSuccess(true);
+            setLoading(false);
+            setTimeout(() => {
+                router.push('/auth/login');
+            }, 2000);
+
+        } catch (err: any) {
+            setError(err?.message ?? "حدث خطأ أثناء إنشاء الحساب.");
             setLoading(false);
         }
     };
